@@ -173,6 +173,160 @@ func sort(nums []int, lo int, hi int) {
 
 比如：节点在第几层，从根节点遍历过来时就能记录下来；节点的子树中有多少节点，就需要遍历完子树后才能清楚。
 
-后序遍历的使用场景：
+后序遍历的使用场景：一旦发现了题目和子树有关，大概率要给函数设置合理的定义和返回值，在后序位置写代码了。
+
+## 二分搜索算法
+
+常用场景：寻找一个数，寻找左侧边界，寻找右侧边界。
+
+二分搜索中不要单独写else，要使用else if把所有场景表明清楚。
+
+for中的<和<=的区别：当right是len-1时，表示right是最后一个元素的索引，搜索区间相当于[left, right]，这时要找到中间值需要<=，保证最后一个元素也能被搜索到。当right是len时，right表示最后一个索引的右面的位置，搜索区间相当于[left, right)，找到最后一个值一定是left位置（也是right-1位置），<就可以搜索到最后一个元素的值了。
+
+搜索边界问题，for中如果是<，要使用[left, right)确定搜索区间，循环结束时left==right；for中如果是<=，要使用[left, right]确定搜索区间，循环结束时left==right-1。
+
+### 搜索左侧边界
+
+for中使用<=，nums[mid] == target时，right = mid-1，循环结束后left==right-1，所以左侧位置就是right+1，也就是left。但需要判断左边界是否存在。
+
+```
+l, r := 0, len(nums)-1
+for l <= r {
+    m := (l+r)/2
+    if nums[m] < target {
+        l = m+1
+    } else if nums[m] > target {
+        r = m-1
+    } else if nums[m] == target {
+        r = m-1
+    }
+}
+// 如果存在nums[l]一定==target，l == r+1，所以l>=0。当所有元素都<target时，r为len-1，这时l就会==len。综上，l的范围是[0, len]
+if l == len(nums) || nums[l] != target {
+    return -1
+}
+return l
+```
+
+### 搜索右侧边界
+
+for中使用<=，nums[mid] == target时，left = mid+1，循环结束后left==right-1，所以右侧位置就是left-1，也就是right。但需要判断右边界是否存在。
+
+```
+l, r := 0, len(nums)-1
+for l <= r {
+    m := (l+r)/2
+    if nums[m] < target {
+        l = m+1
+    } else if nums[m] > target {
+        r = m - 1
+    } else if nums[m] == target {
+        l = m+1
+    }
+}
+// r的范围是[-1, len-1]，当所有元素都>target时右边界就是-1。
+if r < 0 || nums[r] != target {
+    return -1
+}
+return r
+```
+
+## 滑动窗口
+
+滑动窗口属于双指针技巧。常用于处理字符串相关问题。
+
+思路：维护一个窗口不断滑动，然后更新答案。
+
+```
+left, right := 0, 0
+for r < len {
+	// 右侧元素添加到窗口中，增加窗口
+	window.add(s[right])
+	right++
+	// 满足窗口缩短条件后，窗口减小
+	for left < right && 满足窗口缩短条件 {
+		window.remove(s[left])
+		left++
+	}
+}
+```
+
+框架：
+
+```
+func slidingWindow(s string) {
+	window := map[byte]int{} // 窗口可以以多种形式存在
+	left, right := 0, 0
+  for left < right && right < len {
+    // 右侧元素添加到窗口中，增加窗口
+    c := s[right]
+    window.add(c)
+    right++
+    // 更新窗口内的数据(扩大窗口的更新操作)
+    ...
+    /* debug位置 */
+    fmt.Println("window:", left, right)
+    // 判断左侧窗口是否要缩小
+    for left < right && 满足窗口缩短条件 {
+      window.remove(s[left])
+      left++
+      // 更新窗口内数据(缩小窗口的更新操作)
+      ...
+    }
+  }
+}
+```
+
+第二章
+
+双指针：
+
+快慢指针
+
+滑动窗口、链表、
+
+左右指针
+
+二分、两数之和、翻转数组、回文串
 
 
+
+前缀和：
+
+不修改原数组的情况下，频繁求区间内元素累加和。
+
+
+
+差分数组
+
+频繁对原始元素的某个区间的元素进行加减，频繁操作后，输出结果数组。
+
+先构造出差分数组diff，diff[i] = nums[i]-nums[i-1]。
+
+[i, j]的元素+1：diff[i] = diff[i]+1, diff[j+1] = diff[j+1] - 1
+
+通过diff构造出原数组：nums[i] = nums[i-1] + diff[i]
+
+
+
+LRU
+
+
+
+LFU
+
+
+
+O(1)的复杂度删除/查找数组中的元素
+
+- 查找：数据的底层存储一定使用紧凑的数组
+- 添加：元素添加到数组最后
+- 删除：要删除的元素交换到数组最后的位置，为了找到每个元素的索引，需要使用map保存每个元素的索引。
+
+
+
+单调栈
+
+
+
+单调队列
